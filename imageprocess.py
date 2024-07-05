@@ -28,7 +28,7 @@ def clean_image(image_path):
   return thresh
 
 # Example usage
-image_path = "images/ss1.png"  # Replace with your image path
+image_path = "images/image.jpg"  # Replace with your image path
 cleaned_image = clean_image(image_path)
 
 # Display the cleaned image
