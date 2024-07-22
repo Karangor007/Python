@@ -6,21 +6,35 @@ from matplotlib import pyplot as plt
 def is_image_good_for_ocr(image):
     # Calculate contrast
     contrast = image.max() - image.min()
-    
+    print("image contrast value")
+    print(contrast)
+
     # Calculate sharpness using the Laplacian
     laplacian = cv2.Laplacian(image, cv2.CV_64F).var()
-    
+    print("image laplacian value")
+    print(laplacian)
+
     # Check for noise (simple method using standard deviation)
     noise = image.std()
-
+    print("image noise value")
+    print(noise)
     # Thresholds for determining if the image is good for OCR
-    contrast_threshold = 50  # Example threshold
-    sharpness_threshold = 100  # Example threshold
-    noise_threshold = 10  # Example threshold
+    contrast_threshold = 250  # Example threshold
+    sharpness_threshold = 4810  # Example threshold
+    noise_threshold = 50  # Example threshold
+
+    print("final result")
+    print("contrast > contrast_threshold : ",contrast > contrast_threshold)
+    print("laplacian > sharpness_threshold :",laplacian > sharpness_threshold)
+    print("noise > noise_threshold : ",noise >noise_threshold)
+
+    print(contrast > contrast_threshold and
+            laplacian > sharpness_threshold and
+            noise > noise_threshold)
 
     return (contrast > contrast_threshold and
             laplacian > sharpness_threshold and
-            noise < noise_threshold)
+            noise > noise_threshold)
 
 def preprocess_image(image):
     # Apply Gaussian Blur to reduce noise
@@ -33,14 +47,14 @@ def preprocess_image(image):
     sharpened = cv2.filter2D(blurred, -1, kernel)
     
     # Adjust contrast
-    alpha = 1.5  # Contrast control (1.0-3.0)
-    beta = 0    # Brightness control (0-100)
+    alpha = 1.8  # Contrast control (1.0-3.0)
+    beta = 5    # Brightness control (0-100)
     adjusted = cv2.convertScaleAbs(sharpened, alpha=alpha, beta=beta)
     
     # Apply adaptive thresholding to binarize the image
     thresholded = cv2.adaptiveThreshold(adjusted, 255,
                                         cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                        cv2.THRESH_BINARY, 11, 2)
+                                        cv2.THRESH_BINARY, 23, 2)
     
     return thresholded
 
@@ -50,6 +64,7 @@ def main(image_path, output_path):
     
     if is_image_good_for_ocr(image):
         print("Image is good for OCR")
+        preprocessed_image = image
         cv2.imwrite(output_path, image)  # Save the original image
     else:
         print("Image needs preprocessing")
@@ -63,4 +78,4 @@ def main(image_path, output_path):
     plt.show()
 
 # Example usage
-main('images/Media.jpg', 'images/output_image.jpg')
+main('images/demo-invoice.jpg', 'images/output_image.jpg')
