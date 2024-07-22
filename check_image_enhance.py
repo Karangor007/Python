@@ -42,19 +42,19 @@ def preprocess_image(image):
     
     # Sharpening the image using a kernel
     kernel = np.array([[0, -1, 0],
-                       [-1, 5, -1],
+                       [-1, 4.20, -1],
                        [0, -1, 0]])
     sharpened = cv2.filter2D(blurred, -1, kernel)
     
     # Adjust contrast
-    alpha = 1.8  # Contrast control (1.0-3.0)
+    alpha = 1.1  # Contrast control (1.0-3.0)
     beta = 5    # Brightness control (0-100)
     adjusted = cv2.convertScaleAbs(sharpened, alpha=alpha, beta=beta)
     
     # Apply adaptive thresholding to binarize the image
     thresholded = cv2.adaptiveThreshold(adjusted, 255,
                                         cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                        cv2.THRESH_BINARY, 23, 2)
+                                        cv2.THRESH_BINARY, 9, 1.5)
     
     return thresholded
 
@@ -78,4 +78,4 @@ def main(image_path, output_path):
     plt.show()
 
 # Example usage
-main('images/demo-invoice.jpg', 'images/output_image.jpg')
+main('images/image_blur_4.jpg', 'images/output_image.jpg')
