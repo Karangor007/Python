@@ -36,5 +36,5 @@ def enhance_image(image_path):
     cv2.destroyAllWindows()
 
 if __name__ == "__main__":
-    image_path = 'images/image_blur_6.jpg'
+    image_path = 'images/media.jpg'
     enhance_image(image_path)
