@@ -98,7 +98,7 @@ def main():
             # Show the images
             plt.figure(figsize=[18, 5])
             plt.subplot(131); plt.imshow(image, cmap='gray'); plt.title("Original")
-            plt.subplot(132); plt.imshow(deskewed_image, cmap='gray'); plt.title("Deskewed")
+            #plt.subplot(132); plt.imshow(deskewed_image, cmap='gray'); plt.title("Deskewed")
             plt.subplot(133); plt.imshow(preprocessed_image, cmap='gray'); plt.title("Preprocessed")
             plt.show()
             
