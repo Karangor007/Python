@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from skimage import filters, exposure
 from matplotlib import pyplot as plt
 
 def is_image_good_for_ocr(image):
@@ -36,6 +35,28 @@ def is_image_good_for_ocr(image):
             laplacian > sharpness_threshold and
             noise > noise_threshold)
 
+def deskew_image(image):
+    # Convert to binary image
+    _, binary = cv2.threshold(image, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+    # Find coordinates of all non-zero pixels
+    coords = np.column_stack(np.where(binary > 0))
+
+    # Find the angle of the rotated bounding box
+    angle = cv2.minAreaRect(coords)[-1]
+    if angle < -45:
+        angle = -(90 + angle)
+    else:
+        angle = -angle
+
+    # Rotate the image to deskew it
+    (h, w) = image.shape[:2]
+    center = (w // 2, h // 2)
+    M = cv2.getRotationMatrix2D(center, angle, 1.0)
+    deskewed = cv2.warpAffine(image, M, (w, h), flags=cv2.INTER_CUBIC, borderMode=cv2.BORDER_REPLICATE)
+
+    return deskewed
+
 def preprocess_image(image):
     # Apply Gaussian Blur to reduce noise
     blurred = cv2.GaussianBlur(image, (5, 5), 0)
@@ -54,27 +75,31 @@ def preprocess_image(image):
     # Apply adaptive thresholding to binarize the image
     thresholded = cv2.adaptiveThreshold(adjusted, 255,
                                         cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                        cv2.THRESH_BINARY, 9, 1.5)
+                                        cv2.THRESH_BINARY, 5, 0.5)
     
     return thresholded
 
 def main(image_path, output_path):
     # Load the image
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    
-    if is_image_good_for_ocr(image):
+
+    # Deskew the image
+    deskewed_image = deskew_image(image)
+
+    if is_image_good_for_ocr(deskewed_image):
         print("Image is good for OCR")
-        preprocessed_image = image
-        cv2.imwrite(output_path, image)  # Save the original image
+        preprocessed_image = deskewed_image
+        cv2.imwrite(output_path, deskewed_image)  # Save the original image
     else:
         print("Image needs preprocessing")
-        preprocessed_image = preprocess_image(image)
+        preprocessed_image = preprocess_image(deskewed_image)
         cv2.imwrite(output_path, preprocessed_image)  # Save the preprocessed image
     
     # Show the images
     plt.figure(figsize=[18, 5])
-    plt.subplot(121); plt.imshow(image, cmap='gray'); plt.title("Original")
-    plt.subplot(122); plt.imshow(preprocessed_image, cmap='gray'); plt.title("Preprocessed")
+    plt.subplot(131); plt.imshow(image, cmap='gray'); plt.title("Original")
+    #plt.subplot(132); plt.imshow(deskewed_image, cmap='gray'); plt.title("Deskewed")
+    plt.subplot(132); plt.imshow(preprocessed_image, cmap='gray'); plt.title("Preprocessed")
     plt.show()
 
 # Example usage
