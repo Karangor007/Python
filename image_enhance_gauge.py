@@ -45,8 +45,8 @@ def update_image():
     # Show the images
     plt.figure(figsize=[18, 5])
     plt.subplot(131); plt.imshow(image, cmap='gray'); plt.title("Original")
-    plt.subplot(132); plt.imshow(deskewed_image, cmap='gray'); plt.title("Deskewed")
-    plt.subplot(133); plt.imshow(preprocessed_image, cmap='gray'); plt.title("Preprocessed")
+    #plt.subplot(132); plt.imshow(deskewed_image, cmap='gray'); plt.title("Deskewed")
+    plt.subplot(132); plt.imshow(preprocessed_image, cmap='gray'); plt.title("Preprocessed")
     plt.show()
 
 def on_submit():
@@ -71,7 +71,7 @@ def deskew_image(image):
     if angle < -45:
         angle = -(90 + angle)
     else:
-        angle = -angle
+        angle = 0
     (h, w) = image.shape[:2]
     center = (w // 2, h // 2)
     M = cv2.getRotationMatrix2D(center, angle, 1.0)
@@ -83,7 +83,7 @@ def main():
     global alpha_slider, beta_slider, blur_kernel_slider, sharpen_slider, block_size_slider, c_slider
     global root
     
-    image_path = 'images/image_blur_4.jpg'
+    image_path = 'images/invoice_poc_blur.jpg'
     output_path = 'images/output_image.jpg'
 
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)

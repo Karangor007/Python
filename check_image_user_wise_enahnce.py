@@ -71,7 +71,7 @@ def preprocess_image(image, alpha, beta, blur_kernel_size, sharpen_kernel_value,
     return thresholded
 
 def main():
-    image_path = 'images/Invoice(15).jpg'
+    image_path = 'images/invoice_poc_blur.jpg'
     output_path = 'images/output_image.jpg'
 
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)

@@ -90,15 +90,29 @@ def preprocess_image(image):
                                         cv2.THRESH_BINARY, 3, 1.3)
         return thresholded
     elif(laplacian > sharpness_threshold):
+         # Apply Gaussian Blur to reduce noise
+        blurred = cv2.GaussianBlur(image, (5, 5), 1)
+    
         # Sharpening the image using a kernel
         kernel = np.array([[0, -1, 0],
-                       [-1, 4.35, -1],
+                       [-1, 4.20, -1],
                        [0, -1, 0]])
         sharpened = cv2.filter2D(blurred, -1, kernel)
-        return sharpened
+    
+        # Adjust contrast
+        alpha = 1.0  # Contrast control (1.0-3.0)
+        beta = 20    # Brightness control (0-100)
+        adjusted = cv2.convertScaleAbs(sharpened, alpha=alpha, beta=beta)
+    
+        # Apply adaptive thresholding to binarize the image
+        thresholded = cv2.adaptiveThreshold(adjusted, 255,
+                                        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                        cv2.THRESH_BINARY, 19, 1.5)
+    
+        return thresholded
     elif(noise > noise_threshold):
         # Apply Gaussian Blur to reduce noise
-        blurred = cv2.GaussianBlur(image, (5, 5), 0)
+        blurred = cv2.GaussianBlur(image, (5, 5), 1)
         return blurred
     else:
         # Adjust contrast
@@ -137,4 +151,4 @@ def main(image_path, output_path):
     plt.show()
 
 # Example usage
-main('images/Invoice(25).jpg', 'images/output_image.jpg')
+main('images/invoice_poc_blur.jpg', 'images/output_image.jpg')
