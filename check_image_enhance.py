@@ -107,4 +107,4 @@ def main(image_path, output_path):
     plt.show()
 
 # Example usage
-main('images/image_blur_6.jpg', 'images/output_image.jpg')
+main('images/media.jpg', 'images/output_image.jpg')
