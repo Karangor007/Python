@@ -62,26 +62,56 @@ def deskew_image(image):
     return deskewed
 
 def preprocess_image(image):
-    # Apply Gaussian Blur to reduce noise
-    blurred = cv2.GaussianBlur(image, (5, 5), 0)
+
+    # Check for noise (simple method using standard deviation)
+    noise = image.std()
+
+    # Calculate contrast
+    contrast = image.max() - image.min()
+
+    # Calculate sharpness using the Laplacian
+    laplacian = cv2.Laplacian(image, cv2.CV_64F).var()
+
+    # Thresholds for determining if the image is good for OCR
+    contrast_threshold = 250  # Example threshold
+    sharpness_threshold = 4810  # Example threshold
+    noise_threshold = 50  # Example threshold
+
+    # if image contrast is not good 
+    if(contrast > contrast_threshold):
+        # Adjust contrast
+        alpha = 1  # Contrast control (1.0-3.0)
+        beta = 10    # Brightness control (0-100)
+        adjusted = cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
     
-    # Sharpening the image using a kernel
-    kernel = np.array([[0, -1, 0],
+        # Apply adaptive thresholding to binarize the image
+        thresholded = cv2.adaptiveThreshold(adjusted, 255,
+                                        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                        cv2.THRESH_BINARY, 3, 1.3)
+        return thresholded
+    elif(laplacian > sharpness_threshold):
+        # Sharpening the image using a kernel
+        kernel = np.array([[0, -1, 0],
                        [-1, 4.35, -1],
                        [0, -1, 0]])
-    sharpened = cv2.filter2D(blurred, -1, kernel)
+        sharpened = cv2.filter2D(blurred, -1, kernel)
+        return sharpened
+    elif(noise > noise_threshold):
+        # Apply Gaussian Blur to reduce noise
+        blurred = cv2.GaussianBlur(image, (5, 5), 0)
+        return blurred
+    else:
+        # Adjust contrast
+        alpha = 1.0  # Contrast control (1.0-3.0)
+        beta = 20    # Brightness control (0-100)
+        adjusted = cv2.convertScaleAbs(image, alpha=alpha, beta=beta)
     
-    # Adjust contrast
-    alpha = 1.5  # Contrast control (1.0-3.0)
-    beta = 4    # Brightness control (0-100)
-    adjusted = cv2.convertScaleAbs(sharpened, alpha=alpha, beta=beta)
-    
-    # Apply adaptive thresholding to binarize the image
-    thresholded = cv2.adaptiveThreshold(adjusted, 255,
+        # Apply adaptive thresholding to binarize the image
+        thresholded = cv2.adaptiveThreshold(adjusted, 255,
                                         cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                        cv2.THRESH_BINARY, 13, 1.5)
-    
-    return thresholded
+                                        cv2.THRESH_BINARY, 9, 1.1)
+        return thresholded
+
 
 def main(image_path, output_path):
     # Load the image
@@ -107,4 +137,4 @@ def main(image_path, output_path):
     plt.show()
 
 # Example usage
-main('images/media.jpg', 'images/output_image.jpg')
+main('images/Invoice(25).jpg', 'images/output_image.jpg')

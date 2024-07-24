@@ -44,7 +44,7 @@ def deskew_image(image):
     if angle < -45:
         angle = -(90 + angle)
     else:
-        angle = -angle
+        angle = 0
     (h, w) = image.shape[:2]
     center = (w // 2, h // 2)
     M = cv2.getRotationMatrix2D(center, angle, 1.0)
@@ -71,7 +71,7 @@ def preprocess_image(image, alpha, beta, blur_kernel_size, sharpen_kernel_value,
     return thresholded
 
 def main():
-    image_path = 'images/image_blur_4.jpg'
+    image_path = 'images/Invoice(15).jpg'
     output_path = 'images/output_image.jpg'
 
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
