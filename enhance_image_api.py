@@ -4,28 +4,18 @@ from matplotlib import pyplot as plt
 
 def is_image_good_for_ocr(image):
     # Calculate contrast
-    contrast = image.max() - image.min()
-    print("image contrast value")
-    print(contrast)
+    contrast = image.max() - image.min()    
 
     # Calculate sharpness using the Laplacian
-    laplacian = cv2.Laplacian(image, cv2.CV_64F).var()
-    print("image laplacian value")
-    print(laplacian)
+    laplacian = cv2.Laplacian(image, cv2.CV_64F).var()    
 
     # Check for noise (simple method using standard deviation)
     noise = image.std()
-    print("image noise value")
-    print(noise)
+    
     # Thresholds for determining if the image is good for OCR
     contrast_threshold = 250  # Example threshold
     sharpness_threshold = 4810  # Example threshold
     noise_threshold = 50  # Example threshold
-
-    print("final result")
-    print("contrast > contrast_threshold : ",contrast > contrast_threshold)
-    print("laplacian > sharpness_threshold :",laplacian > sharpness_threshold)
-    print("noise > noise_threshold : ",noise >noise_threshold)
 
     print(contrast > contrast_threshold and
             laplacian > sharpness_threshold and
