@@ -44,11 +44,15 @@ def deskew_image(image):
 
     # Find the angle of the rotated bounding box
     angle = cv2.minAreaRect(coords)[-1]
+    print("angle")
+    print(angle)
     if angle < -45:
         angle = -(90 + angle)
     else:
-        angle = -angle
+        angle = 0
 
+    print("after angle")
+    print(angle)
     # Rotate the image to deskew it
     (h, w) = image.shape[:2]
     center = (w // 2, h // 2)
@@ -63,19 +67,19 @@ def preprocess_image(image):
     
     # Sharpening the image using a kernel
     kernel = np.array([[0, -1, 0],
-                       [-1, 4.20, -1],
+                       [-1, 4.35, -1],
                        [0, -1, 0]])
     sharpened = cv2.filter2D(blurred, -1, kernel)
     
     # Adjust contrast
-    alpha = 1.1  # Contrast control (1.0-3.0)
-    beta = 5    # Brightness control (0-100)
+    alpha = 1.5  # Contrast control (1.0-3.0)
+    beta = 4    # Brightness control (0-100)
     adjusted = cv2.convertScaleAbs(sharpened, alpha=alpha, beta=beta)
     
     # Apply adaptive thresholding to binarize the image
     thresholded = cv2.adaptiveThreshold(adjusted, 255,
                                         cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
-                                        cv2.THRESH_BINARY, 5, 0.5)
+                                        cv2.THRESH_BINARY, 13, 1.5)
     
     return thresholded
 
@@ -103,4 +107,4 @@ def main(image_path, output_path):
     plt.show()
 
 # Example usage
-main('images/image_blur_4.jpg', 'images/output_image.jpg')
+main('images/image_blur_6.jpg', 'images/output_image.jpg')
